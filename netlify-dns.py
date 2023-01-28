@@ -72,7 +72,7 @@ if __name__ == '__main__':
     # export NETLIFY_URL
     try:
         URL = os.environ['NETLIFY_URL']
-        urlv1 = URL.replace(".com", "_com")
+        urlv1 = URL.replace(".de", "_de")
     except:
         print("Couldn't Get API_TOKEN evn var")
         sys.exit(1)
