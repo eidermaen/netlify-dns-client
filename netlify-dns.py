@@ -5,7 +5,7 @@ from urllib import request, parse
 import json
 import sys
 
-LOG_FILE = open('/var/log/netlifydns.log', 'w')
+LOG_FILE = open('/home/pi/netlifydns.log', 'w')
 oldid = None
 oldip = None
 
@@ -16,8 +16,12 @@ def getNetlifyDNS():
                              headers={'Content-Type': 'application/json;charset=utf-8',
                                       'Authorization': 'Bearer ' + API_TOKEN})
     current = json.loads(request.urlopen(getreq).read().decode("utf-8"))
-    oldid = current[0]['id']
-    oldip = current[0]['value']
+
+    for entry in current:
+        if entry['hostname'] == url_to_update:
+            oldid = entry['id']
+            oldip = entry['value']
+            return
 
 
 def AddNetlifyDNS():
@@ -31,7 +35,7 @@ def AddNetlifyDNS():
 
 
         netlify_add_req = {}
-        netlify_add_req['hostname'] = URL
+        netlify_add_req['hostname'] = url_to_update
         netlify_add_req['ttl'] = 3600
         netlify_add_req['type'] = "A"
         netlify_add_req['value'] = ipresp['ip']
@@ -72,6 +76,7 @@ if __name__ == '__main__':
     # export NETLIFY_URL
     try:
         URL = os.environ['NETLIFY_URL']
+        url_to_update = os.environ['NETLIFY_CHANGE_URL']
         urlv1 = URL.replace(".de", "_de")
     except:
         print("Couldn't Get API_TOKEN evn var")
